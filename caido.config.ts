@@ -14,7 +14,7 @@ export default defineConfig({
   id: "cerebrum",
   name: "Cerebrum",
   description: "A simple organizer-like plugin for Caido to help you manage, annotate, and sort HTTP requests.",
-  version: "1.0.0",
+  version: "1.0.1",
   author: {
     name: "DewSecOff",
     email: "DewSecOff@protonmail.com",
