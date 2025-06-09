@@ -1,0 +1,31 @@
+{
+  "id": "cerebrum",
+  "name": "Cerebrum",
+  "version": "1.0.0",
+  "description": "A simple plugin to organize, annotate and filter requests in Caido.",
+  "author": {
+    "name": "DewSecOff",
+    "email": "DewSecOff@protonmail.com",
+    "url": "https://your-portfolio.com"
+  },
+  "links": {},
+  "plugins": [
+    {
+      "id": "backend",
+      "kind": "backend",
+      "name": "backend",
+      "entrypoint": "backend/index.js",
+      "runtime": "javascript"
+    },
+    {
+      "id": "frontend",
+      "kind": "frontend",
+      "name": "frontend",
+      "entrypoint": "frontend/index.js",
+      "style": "frontend/index.css",
+      "backend": {
+        "id": "backend"
+      }
+    }
+  ]
+}
