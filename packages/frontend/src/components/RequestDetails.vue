@@ -78,10 +78,10 @@ const computedRows = computed(() => {
 
 // Dropdown options for request status
 const pendingOptions = [
-  { label: "Important", value: "Important" },
   { label: "Not touched", value: "Not touched" },
   { label: "Pending", value: "Pending" },
   { label: "Finished", value: "Finished" },
+  { label: "Important", value: "Important" },
 ];
 
 // Track rawBlock height to match note section height

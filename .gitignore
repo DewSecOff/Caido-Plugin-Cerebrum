@@ -1,0 +1,16 @@
+# Caido plugin build output
+dist/
+packages/frontend/dist/
+packages/backend/dist/
+
+# Node
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Env
+.env

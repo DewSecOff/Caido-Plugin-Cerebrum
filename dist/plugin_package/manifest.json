@@ -1,8 +1,8 @@
 {
   "id": "cerebrum",
   "name": "Cerebrum",
-  "version": "1.0.0",
-  "description": "A simple plugin to organize, annotate and filter requests in Caido.",
+  "version": "1.0.1",
+  "description": "A simple organizer-like plugin for Caido to help you manage, annotate, and sort HTTP requests.",
   "author": {
     "name": "DewSecOff",
     "email": "DewSecOff@protonmail.com",

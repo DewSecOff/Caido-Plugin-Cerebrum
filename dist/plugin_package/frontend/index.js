@@ -31447,10 +31447,10 @@ const iw = { class: "relative p-4 border-t border-surface-300 dark:border-surfac
 `).length;
       return Math.min(f, bw);
     }), u = [
-      { label: "Important", value: "Important" },
       { label: "Not touched", value: "Not touched" },
       { label: "Pending", value: "Pending" },
-      { label: "Finished", value: "Finished" }
+      { label: "Finished", value: "Finished" },
+      { label: "Important", value: "Important" }
     ], s = je(null), c = je(0);
     let d = null;
     _r(() => {
@@ -31587,10 +31587,9 @@ const iw = { class: "relative p-4 border-t border-surface-300 dark:border-surfac
       const p = new Set(n.value.map((f) => String(f.status)));
       return ["All", ...Array.from(p).sort()];
     }), a = async () => {
-      console.log("📥 Manual loading of requests");
       try {
         const p = await t.backend.getAllRequests();
-        console.log("🧪 Backend result:", p), n.value = p;
+        n.value = p;
       } catch (p) {
         console.error("❌ Failed to load requests:", p), t.window.showToast("Erreur lors du chargement des requêtes", {
           duration: 3e3
@@ -31698,7 +31697,6 @@ const iw = { class: "relative p-4 border-t border-surface-300 dark:border-surfac
   var n, r;
   if (t.type === "RequestRowContext") {
     const i = t.requests.slice(0, 10);
-    console.log("📤 Selected requests:", i);
     for (const o of i) {
       const a = await e.graphql.request(
         { id: o.id },
@@ -31720,7 +31718,7 @@ const iw = { class: "relative p-4 border-t border-surface-300 dark:border-surfac
           }
         `
       ), l = a.request.host, u = a.request.port ?? 0, s = a.request.path, c = a.request.raw, d = ((n = a.request.response) == null ? void 0 : n.statusCode) ?? -1, p = a.request.length ?? 0, f = ((r = a.request.response) == null ? void 0 : r.length) ?? 0, g = a.request.createdAt ?? "<no timestamp>";
-      if (console.log("📥 Request raw:", c), console.log("📤 Time:", g), console.log("📤 Status:", d), console.log("📤 Resp Length:", f), console.log("📤 Req Length:", p), !c) {
+      if (!c) {
         e.window.showToast("Missing raw request", { duration: 3e3 });
         continue;
       }
@@ -31734,7 +31732,7 @@ const iw = { class: "relative p-4 border-t border-surface-300 dark:border-surfac
         status: d,
         reqLength: p,
         respLength: f
-      }), console.log("🧾 GraphQL response:", JSON.stringify(a, null, 2));
+      });
     }
     e.window.showToast(`Sent ${i.length} requests to Cerebrum`, {
       duration: 3e3

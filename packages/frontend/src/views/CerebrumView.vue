@@ -71,10 +71,10 @@ const statusOptions = computed(() => {
 
 // Load all requests from the backend
 const loadRequests = async () => {
-  console.log("📥 Manual loading of requests");
+  //console.log("📥 Manual loading of requests");
   try {
     const result = await sdk.backend.getAllRequests();
-    console.log("🧪 Backend result:", result);
+    //console.log("🧪 Backend result:", result);
     requests.value = result;
   } catch (e) {
     console.error("❌ Failed to load requests:", e);

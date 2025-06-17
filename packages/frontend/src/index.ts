@@ -77,7 +77,7 @@ export const sendToCerebrum = async (
   if (context.type === "RequestRowContext") {
     // Limit to first 10 requests for performance
     const requests = context.requests.slice(0, 10);
-    console.log("📤 Selected requests:", requests);
+    //console.log("📤 Selected requests:", requests);
 
     for (const r of requests) {
       // Query detailed request data using GraphQL
@@ -127,11 +127,11 @@ export const sendToCerebrum = async (
       const requestTime = gql.request.createdAt ?? "<no timestamp>";
 
       // Log for debugging
-      console.log("📥 Request raw:", reqRaw);
-      console.log("📤 Time:", requestTime);
-      console.log("📤 Status:", statusCode);
-      console.log("📤 Resp Length:", lengthResp);
-      console.log("📤 Req Length:", lengthReq);
+      //console.log("📥 Request raw:", reqRaw);
+      //console.log("📤 Time:", requestTime);
+      //console.log("📤 Status:", statusCode);
+      //console.log("📤 Resp Length:", lengthResp);
+      //console.log("📤 Req Length:", lengthReq);
 
       // Skip if no raw request is available
       if (!reqRaw) {
@@ -153,7 +153,7 @@ export const sendToCerebrum = async (
       });
 
       // Log full result for inspection
-      console.log("🧾 GraphQL response:", JSON.stringify(gql, null, 2));
+      //console.log("🧾 GraphQL response:", JSON.stringify(gql, null, 2));
     }
 
     // Show a success message
