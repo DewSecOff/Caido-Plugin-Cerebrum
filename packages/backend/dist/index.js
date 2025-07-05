@@ -25,8 +25,7 @@ async function init(sdk) {
     return "OK";
   });
   sdk.api.register("getAllRequests", async () => {
-    const db2 = await sdk.meta.db();
-    const stmt = await db2.prepare("SELECT * FROM requests");
+    const stmt = await db.prepare("SELECT * FROM requests");
     const rows = await stmt.all();
     const tab_request = rows.map((row) => ({
       id: row.id,

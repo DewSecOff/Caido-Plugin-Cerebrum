@@ -5,6 +5,8 @@ packages/backend/dist/
 
 # Node
 node_modules/
+packages/frontend/node_modules/
+packages/backend/node_modules/
 
 # Logs
 npm-debug.log*

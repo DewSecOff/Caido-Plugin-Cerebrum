@@ -41,7 +41,7 @@ export async function init(sdk: SDK<BackendAPI>) {
 
   // Register API method to get all stored requests
   sdk.api.register("getAllRequests", async () => {
-    const db = await sdk.meta.db();
+    //const db = await sdk.meta.db();
     const stmt = await db.prepare("SELECT * FROM requests");
     const rows = await stmt.all<DBRow>();
     //sdk.console.log(`🚨 Raw rows from DB: ${rows}`);
