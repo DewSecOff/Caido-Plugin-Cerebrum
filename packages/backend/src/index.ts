@@ -80,7 +80,7 @@ export async function init(sdk: SDK<BackendAPI>) {
 
   // Register API method to delete a request by ID
   sdk.api.register("deleteRequest", async (_sdk, id: string) => {
-    const db = await sdk.meta.db();
+    //const db = await sdk.meta.db();
     const stmt = await db.prepare(`DELETE FROM requests WHERE id = ?`);
     await stmt.run(id);
   });
