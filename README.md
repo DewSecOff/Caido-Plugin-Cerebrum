@@ -13,7 +13,7 @@
 
 ## 🚀 Screenshots
 
-![Main UI](./images/Cerebrum_v1.png)
+![Main UI](./images/Cerebrum_v1.0.4.png)
 ![Context Menu](./images/Cerebrum_v1_context.png)
 
 ## 🛠 Usage
