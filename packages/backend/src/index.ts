@@ -1,11 +1,8 @@
 import type { DefineAPI, DefineEvents, SDK } from "caido:plugin";
 
 // Backend entry point
-export async function init(sdk: SDK<BackendAPI>) {
-  //console.log("📦 Cerebrum backend loaded");
-  //sdk.console.log("📦 Cerebrum backend loaded");
-
-  // Access the Caido-provided embedded SQLite database
+export async function init(sdk: SDK<BackendAPI, BackendEvents>) {
+  
   const db = await sdk.meta.db();
 
   // Ensure DB table exists (only once at plugin startup)
@@ -18,9 +15,12 @@ export async function init(sdk: SDK<BackendAPI>) {
       port INTEGER,
       isTls INTEGER,
       reqRaw TEXT,
-      status INTEGER,
+      method TEXT,
+      url TEXT,
+      headers TEXT,
+      body TEXT,
+      status TEXT,
       reqLength INTEGER,
-      respLength INTEGER,
       pending TEXT,
       note TEXT
     )
@@ -30,10 +30,10 @@ export async function init(sdk: SDK<BackendAPI>) {
   sdk.api.register("saveRequest", async (_sdk, req: CerebrumRequest) => {
     try {
       await insertRequest(db, sdk, req);
+      sdk.api.send("new-request", req);
     } catch (e) {
       //sdk.console.log(`❌ Failed to save request: ${e}`);
     }
-
     return "OK";
   });
 
@@ -55,10 +55,12 @@ export async function init(sdk: SDK<BackendAPI>) {
       port: row.port,
       isTls: !!row.isTls,
       reqRaw: row.reqRaw,
-      method: extractMethod(row.reqRaw),
+      method: row.method,
+      url: row.url,
+      headers: JSON.parse(row.headers || "[]"),
+      body: row.body,
       status: row.status,
       reqLength: row.reqLength,
-      respLength: row.respLength,
       pending: row.pending,
       note: row.note,
     }));
@@ -90,9 +92,9 @@ export async function init(sdk: SDK<BackendAPI>) {
 async function insertRequest(db: Awaited<ReturnType<SDK["meta"]["db"]>>, sdk: SDK, req: CerebrumRequest) {
   const stmt = await db.prepare(`
     INSERT OR REPLACE INTO requests 
-    (time, host, path, port, isTls, reqRaw, status, reqLength, respLength, pending, note) 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `);
+       (time, host, path, port, isTls, reqRaw, method, url, headers, body, status, reqLength, pending, note) 
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+   `);
 
   const result = await stmt.run(
     req.time,
@@ -101,11 +103,14 @@ async function insertRequest(db: Awaited<ReturnType<SDK["meta"]["db"]>>, sdk: SD
     req.port,
     req.isTls ? 1 : 0,
     req.reqRaw,
+    req.method ?? "",
+    req.url && req.url !== "" ? req.url : rebuildUrl(req),
+    JSON.stringify(req.headers && req.headers.length > 0 ? req.headers : parseHeaders(req.reqRaw)),
+    req.body ?? "",
     req.status,
     req.reqLength,
-    req.respLength,
-    "Not touched", // default pending
-    "Empty"        // default note
+    "Not touched",
+    "Empty"
   );
 
   //sdk.console.log(`🧾 Inserted request: ${result.lastInsertRowid}`);
@@ -121,8 +126,9 @@ export type BackendAPI = DefineAPI<{
 
 // Optional: event types for backend → frontend communication
 export type BackendEvents = DefineEvents<{
-  "new-request": (req: CerebrumRequest) => void;
+  "new-request": (cerebrumRequest: CerebrumRequest) => void;
 }>;
+
 
 // Frontend payload type when saving a request
 export type CerebrumRequest = {
@@ -132,9 +138,12 @@ export type CerebrumRequest = {
   port: number;
   isTls: boolean;
   reqRaw: string;
-  status: number;
+  method: string;
+  url: string;
+  headers: { name: string; value: string }[];
+  body: string;
+  status: string;
   reqLength: number;
-  respLength: number;
 };
 
 // Internal database row structure
@@ -144,11 +153,14 @@ type DBRow = {
   host: string;
   path: string;
   port: number;
-  isTls: number; // SQLite uses INTEGER for booleans
+  isTls: number;
   reqRaw: string;
-  status: number;
+  method: string;
+  url: string;
+  headers: string; // stocké en JSON
+  body: string;
+  status: string;
   reqLength: number;
-  respLength: number;
   pending: string;
   note: string;
 };
@@ -163,38 +175,44 @@ export type CerebrumEntry = {
   isTls: boolean;
   reqRaw: string;
   method: string;
-  status: number;
+  url: string;
+  headers: { name: string; value: string }[];
+  body: string;
+  status: string;
   reqLength: number;
-  respLength: number;
   pending: string;
   note: string;
 };
 
-// Helper: Dump all rows for debugging
-async function dumpAllRequests(db: Awaited<ReturnType<SDK["meta"]["db"]>>, sdk: SDK) {
-  try {
-    const stmt = await db.prepare("SELECT * FROM requests");
-    const rows = await stmt.all<DBRow>();
+function rebuildUrl(req: CerebrumRequest): string {
+  // Essaie de récupérer le path et query depuis reqRaw
+  const raw = req.reqRaw;
+  const match = raw.match(/^[A-Z]+\s+([^\s]+)\s+/);
 
-    //sdk.console.log(`📤 Dumping ${rows.length} requests from DB:`);
+  let pathAndQuery = req.path;
 
-    /*for (const row of rows) {
-      /*sdk.console.log(
-        `🧾 [${row.id}] ${row.host}:${row.port} TLS=${!!row.isTls}\n${row.reqRaw}\n`
-      );
-    }*/
-  } catch (error) {
-    sdk.console.error(`❌ Failed to dump requests: ${error}`);
+  if (match && match[1]) {
+    pathAndQuery = match[1];
   }
+
+  return `${req.isTls ? "https" : "http"}://${req.host}${pathAndQuery}`;
 }
 
-// Extract HTTP method from raw request
-function extractMethod(raw: string): string {
-  return raw.split(" ")[0] || "UNKNOWN";
-}
+function parseHeaders(raw: string): { name: string; value: string }[] {
+  const lines = raw.split("\r\n");
+  // Ignore request line (GET / HTTP/1.1)
+  const headerLines = lines.slice(1).filter(line => line.trim() !== "");
 
-// Optional: extract path or URL from raw request (unused)
-function extractUrl(raw: string): string {
-  const parts = raw.split(" ");
-  return (parts.length > 1 ? parts[1] : "/") || " ";
+  const headers: { name: string; value: string }[] = [];
+
+  for (const line of headerLines) {
+    const idx = line.indexOf(":");
+    if (idx > -1) {
+      const name = line.slice(0, idx).trim();
+      const value = line.slice(idx + 1).trim();
+      headers.push({ name, value });
+    }
+  }
+
+  return headers;
 }

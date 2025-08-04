@@ -7,6 +7,8 @@
   },
   "dependencies": {
     "@caido/primevue": "0.1.2",
+    "primeicons": "^7.0.0",
+    "primereact": "^10.9.6",
     "primevue": "4.1.0",
     "vue": "3.4.37"
   },
@@ -14,7 +16,9 @@
     "@caido/sdk-backend": "^0.46.0",
     "@caido/sdk-frontend": "^0.46.0",
     "@codemirror/view": "6.28.1",
+    "@vitejs/plugin-react": "^4.7.0",
     "backend": "workspace:*",
+    "vite": "^7.0.6",
     "vue-tsc": "2.0.29"
   }
 }
