@@ -100,7 +100,22 @@ export default function RequestTable({
         />
         <Column field="method" header="Method" sortable resizeable/>
         <Column field="host" header="Host" sortable resizeable/>
-        <Column field="path" header="Path" sortable resizeable/>
+        <Column
+          header="Path"
+          field="path"               // nécessaire pour le style par défaut
+          sortField="url"            // on trie sur row.url (chemin + paramètres)
+          sortable
+          resizeable
+          body={(row: Request) => {
+            if (!row.url) return row.path;
+            try {
+              const u = new URL(row.url);
+              return `${u.pathname}${u.search}`;
+            } catch {
+              return row.path;
+            }
+          }}
+        />
         <Column field="port" header="Port" sortable resizeable/>
         <Column field="reqLength" header="Req Length" sortable resizeable/>
 
