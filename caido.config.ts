@@ -14,11 +14,11 @@ export default defineConfig({
   id: 'cerebrum',
   name: 'Cerebrum',
   description: 'A simple organizer-like plugin for Caido to help you manage, annotate, and sort HTTP requests.',
-  version: '1.0.4',
+  version: '1.0.5',
   author: {
     name: 'DewSecOff',
     email: 'DewSecOff@protonmail.com',
-    url: 'https://your-portfolio.com',
+    url: 'https://x.com/DewSecOff',
   },
   plugins: [
     {
