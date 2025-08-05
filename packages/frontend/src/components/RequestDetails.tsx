@@ -34,7 +34,7 @@ export default function RequestDetails({
 
   const statusOptions = [
     { label: "Not touched", value: "Not touched", activeBg: "#6B7280", activeText: "#FFFFFF" }, // gray-500
-    { label: "Pending",     value: "Pending",     activeBg: "#FACC15", activeText: "#000000" }, // yellow-400
+    { label: "Pending",     value: "Pending",     activeBg: "#D97706", activeText: "#FFFFFF" }, // yellow-400
     { label: "Finished",    value: "Finished",    activeBg: "#16A34A", activeText: "#FFFFFF" }, // green-600
     { label: "Important",   value: "Important",   activeBg: "#DC2626", activeText: "#FFFFFF" }, // red-600
     ];
@@ -72,7 +72,9 @@ export default function RequestDetails({
                 onBlur={() => setIsEditing(false)}
                 rows={10}
                 className="
-                  w-full h-full resize-none bg-gray-100 dark:bg-gray-700 rounded p-2 border border-white
+                  w-full h-full resize-none
+                  bg-gray-800 text-gray-100
+                  rounded p-2 border border-gray-600
                 "
               />
             ) : (

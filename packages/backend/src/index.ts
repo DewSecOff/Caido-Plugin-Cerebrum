@@ -31,6 +31,7 @@ export async function init(sdk: SDK<BackendAPI, BackendEvents>) {
     try {
       await insertRequest(db, sdk, req);
       sdk.api.send("new-request", req);
+      sdk.api.send("actualise");
     } catch (e) {
       //sdk.console.log(`❌ Failed to save request: ${e}`);
     }
@@ -127,6 +128,7 @@ export type BackendAPI = DefineAPI<{
 // Optional: event types for backend → frontend communication
 export type BackendEvents = DefineEvents<{
   "new-request": (cerebrumRequest: CerebrumRequest) => void;
+  "actualise": (entry: CerebrumEntry) => void;
 }>;
 
 

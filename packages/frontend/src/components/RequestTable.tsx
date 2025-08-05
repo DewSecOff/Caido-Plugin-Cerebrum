@@ -108,7 +108,7 @@ export default function RequestTable({
         <Column
           field="pending"
           header="Pending"
-          body={(row) => <span style={getPendingStyles(row.pending)}>{row.pending}</span>}
+          body={(row) => row.pending}
           sortable
           resizeable
         />
