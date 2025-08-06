@@ -9,7 +9,7 @@
 - Filter requests by status, search, and fields
 - Inline context menu to delete requests
 - Note + status saved locally and in SQLite
-- UI built with PrimeVue and TailwindCSS
+- UI built with React and TailwindCSS
 
 ## 🚀 Screenshots
 
@@ -24,29 +24,25 @@
 
 ## 📦 Technical Stack
 
-- **Frontend**: Vue 3 + PrimeVue + TailwindCSS
+- **Frontend**: React + TailwindCSS
 - **Backend**: Caido plugin API + SQLite
 - **SDKs**: Caido Frontend/Backend SDKs + GraphQL
 
 ## 🧪 Known limitations
 
-- 🔁 Replay integration is currently disabled
 - 📥 Requests are read-only once saved (raw cannot be edited)
-- 🖍️ No syntax highlighting in the request display
 - 📝 No export/import functionality yet
 
 ## 📁 Structure
 
 - `backend/` — SQLite logic + API definitions
-- `frontend/` — Vue UI, SDK integration, filtering
-- `src/components` — `RequestTable.vue`, `RequestDetails.vue`, etc.
+- `frontend/` — React UI, SDK integration, filtering
+- `src/components` — `RequestTable.tsx`, `RequestDetails.tsx`, etc.
 
 ## 🎯 Future Goals
 
 - 🔄 Automatically load requests on startup (avoid relying on manual "load" button)
 - 📤 Support sending requests back into Replay
-- 🌈 Add HTTP request syntax highlighting (via Caido editors or external lib)
-- 📝 Support markdown syntax inside notes
 - 📦 Add JSON export for individual or full request data
 
 ## 🧑‍💻 Author
