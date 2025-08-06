@@ -296,8 +296,11 @@ html {
    3) Sélection
 ───────────────────────────────────────────────────────────── */
 .p-datatable-tbody > tr.p-highlight {
-  background-color: #0F85EB !important;       /* bleu Caido */
+  /*background-color: #0F85EB !important;       /* bleu Caido */
   color:            #FFFFFF !important;
+  outline:               2px solid #FFFFFF !important;  /* bordure blanche */
+  outline-offset:       -2px;                 /* rapproche l’outline du contenu */
+  
 }
 
 /* ────────────────────────────────────────────────────────────

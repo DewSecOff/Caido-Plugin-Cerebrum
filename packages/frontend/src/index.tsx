@@ -197,6 +197,7 @@ function parseHeaders(raw: string) {
       caido.window.showToast(`Sent 1 request to Cerebrum`, { duration: 3000 });
     },
   });
+  
   caido.menu.registerItem({
     type: "Request",
     commandId: "send-to-cerebrum-editor",

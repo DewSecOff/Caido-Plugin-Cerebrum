@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback } from "react";
+import React, { useRef, useState, useCallback } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { ContextMenu } from "primereact/contextmenu";
@@ -20,7 +20,9 @@ export default function RequestTable({
   onDeleteRequest,
 }: RequestTableProps) {
   const cm = useRef<ContextMenu>(null);
-  const [selectedRow, setSelectedRow] = useState<Request | null>(null);
+  const [selectedRow, setSelectedRow] = useState<Request | undefined>(undefined);
+  const [menuPos, setMenuPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [contextRow, setContextRow] = useState<Request | undefined>(undefined);
 
   const formatDate = useCallback((iso: string) =>
     iso.replace("T", " ").replace(/\.000Z$/, ""),
@@ -32,19 +34,21 @@ export default function RequestTable({
   }, []);
 
   const contextItems = [
-    {
+     {
       label: "🗑️ Delete",
-      command: () => selectedRow && onDeleteRequest(selectedRow.id),
+      command: () => contextRow && onDeleteRequest(contextRow.id),
     },
   ];
 
   const onRowRightClick = (event: any) => {
     event.originalEvent.preventDefault();
-    setSelectedRow(event.data);
-    cm.current?.show(event.originalEvent);
+    // On met à jour uniquement contextRow
+     setContextRow(event.data);
+     cm.current?.show(event.originalEvent);
   };
 
   const onRowClick = (event: any) => {
+    setSelectedRow(event.data);
     onSelect(event.data);
   };
 
@@ -63,13 +67,31 @@ export default function RequestTable({
 
   return (
     <>
-      <ContextMenu model={contextItems} ref={cm} />
+     <ContextMenu
+        model={contextItems}
+        ref={cm}
+        appendTo={document.body}
+        style={{
+          position: "fixed",
+          top: menuPos.y,
+          left: menuPos.x,
+          margin: 0,
+          padding: "4px 8px",
+          listStyle: "none",
+          background: "#2d2d2d",
+          color: "#fff",
+          border: "1px solid #555",
+          borderRadius: 4,
+          zIndex: 10000,
+          minWidth: 160,
+        }}
+      />
 
-      <DataTable
-       resizableColumns
-       columnResizeMode="fit"
-        value={requests}
-        rowClassName={(rowData) => {
+        <DataTable
+  resizableColumns
+  columnResizeMode="fit"
+  value={requests}
+  rowClassName={(rowData) => {
           switch (rowData.pending) {
             case "Pending":
               return "row-pending";
@@ -81,15 +103,17 @@ export default function RequestTable({
               return "bg-[#30333B] text-white";
           }
         }}
-        onRowClick={onRowClick}
-        selectionMode="single"
-        dataKey="id"
-        onContextMenu={onRowRightClick}
-        className="w-full"
-        sortMode="multiple"
-        tableStyle={{ tableLayout: 'fixed', width: '100%' }}
-        removableSort
-      >
+  onRowClick={onRowClick}
+  selectionMode="single"            // sélection de ligne normale
+  dataKey="id"
+  onContextMenu={onRowRightClick}
+  contextMenuSelection={selectedRow} // highlighted row dans votre menu
+  className="w-full"
+  selection={selectedRow}
+  sortMode="multiple"
+  tableStyle={{ tableLayout: 'fixed', width: '100%' }}
+  removableSort
+>
         <Column field="id" header="ID" sortable resizeable style={{ width: '3%' }}/>
         <Column
           field="time"
