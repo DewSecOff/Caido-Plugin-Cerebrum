@@ -1,12 +1,36 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
 import type { Caido } from "@caido/sdk-frontend";
 import type { BackendAPI, BackendEvents } from "backend";
 import { SDKProvider, useSDK } from "./plugins/sdk";
 import Cerebrum from "./Cerebrum";
 import type { CommandContext } from "@caido/sdk-frontend/src/types";
+import type { CerebrumEntry } from "../../backend/src/index";
 
 export type CaidoSDK = Caido<BackendAPI, BackendEvents>;
+
+/**
+ * App wrapper for top-level data loading
+ */
+function App() {
+  const sdk = useSDK();
+  const [allRequests, setAllRequests] = useState<CerebrumEntry[]>([]);
+
+  // Initial load only
+  useEffect(() => {
+    // initial load
+    sdk.backend.getAllRequests().then(setAllRequests);
+
+    // reload when the page becomes active again
+    const handler = () => {
+      sdk.backend.getAllRequests().then(setAllRequests);
+    };
+    window.addEventListener("cerebrum:page-show", handler);
+    return () => window.removeEventListener("cerebrum:page-show", handler);
+  }, [sdk.backend]);
+
+  return <Cerebrum initialRequests={allRequests} />;
+} 
 
 export function init(caido: CaidoSDK) {
   // --- Setup de votre UI principal ---
@@ -17,7 +41,7 @@ export function init(caido: CaidoSDK) {
   ReactDOM.createRoot(rootEl).render(
     <React.StrictMode>
       <SDKProvider sdk={caido}>
-        <Cerebrum />
+        <App />
       </SDKProvider>
     </React.StrictMode>
   );
@@ -189,6 +213,7 @@ function parseHeaders(raw: string) {
   });
 
 window.addEventListener("cerebrum:clear-badge", () => {
+  badgeCount = 0; 
   sidebarItem.setCount(0);
 });
 }

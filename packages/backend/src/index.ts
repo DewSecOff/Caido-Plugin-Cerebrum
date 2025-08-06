@@ -46,7 +46,7 @@ export async function init(sdk: SDK<BackendAPI, BackendEvents>) {
     const stmt = await db.prepare("SELECT * FROM requests");
     const rows = await stmt.all<DBRow>();
     //sdk.console.log(`🚨 Raw rows from DB: ${rows}`);
-
+    
     // Transform DB rows into frontend-friendly shape
     const tab_request = rows.map<CerebrumEntry>((row) => ({
       id: row.id,

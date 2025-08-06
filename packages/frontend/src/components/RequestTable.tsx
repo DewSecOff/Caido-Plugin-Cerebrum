@@ -87,9 +87,10 @@ export default function RequestTable({
         onContextMenu={onRowRightClick}
         className="w-full"
         sortMode="multiple"
+        tableStyle={{ tableLayout: 'fixed', width: '100%' }}
         removableSort
       >
-        <Column field="id" header="ID" sortable resizeable/>
+        <Column field="id" header="ID" sortable resizeable style={{ width: '3%' }}/>
         <Column
           field="time"
           header="Time"
@@ -97,9 +98,10 @@ export default function RequestTable({
           sortable
           sortField="time"
           resizeable
+          style={{ width: '12%' }}
         />
-        <Column field="method" header="Method" sortable resizeable/>
-        <Column field="host" header="Host" sortable resizeable/>
+        <Column field="method" header="Method" sortable resizeable style={{ width: '6%' }}/>
+        <Column field="host" header="Host" sortable resizeable style={{ width: '14%' }}/>
         <Column
           header="Path"
           field="path"               // nécessaire pour le style par défaut
@@ -116,8 +118,8 @@ export default function RequestTable({
             }
           }}
         />
-        <Column field="port" header="Port" sortable resizeable/>
-        <Column field="reqLength" header="Req Length" sortable resizeable/>
+        <Column field="port" header="Port" sortable resizeable style={{ width: '5%' }}/>
+        <Column field="reqLength" header="Req Length" sortable resizeable style={{ width: '6%' }}/>
 
         {/* Champ « Pending » si vous le gardez */}
         <Column
@@ -126,11 +128,13 @@ export default function RequestTable({
           body={(row) => row.pending}
           sortable
           resizeable
+          style={{ width: '8%' }}
         />
 
         <Column
           field="note"
           header="Note"
+          style={{ width: '4%' }}
           resizeable
           body={(row) => (
             <span className="truncate block max-w-[80px]" title={row.note}>
