@@ -2,7 +2,7 @@
   "name": "backend",
   "version": "0.0.0",
   "type": "module",
-  "types": "src/index.tsx",
+  "types": "src/index.ts",
   "scripts": {
     "typecheck": "tsc --noEmit"
   },

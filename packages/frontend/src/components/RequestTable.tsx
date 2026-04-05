@@ -21,17 +21,13 @@ export default function RequestTable({
 }: RequestTableProps) {
   const cm = useRef<ContextMenu>(null);
   const [selectedRow, setSelectedRow] = useState<Request | undefined>(undefined);
-  const [menuPos, setMenuPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const [contextRow, setContextRow] = useState<Request | undefined>(undefined);
 
   const formatDate = useCallback((iso: string) =>
     iso.replace("T", " ").replace(/\.000Z$/, ""),
   [],);
 
-  const truncateNote = useCallback((note: string) => {
-    if (!note) return "";
-    return note.length > 5 ? note.slice(0, 5) + "..." : note;
-  }, []);
+
 
   const contextItems = [
      {
@@ -52,18 +48,7 @@ export default function RequestTable({
     onSelect(event.data);
   };
 
-  const getPendingStyles = useCallback((pending: string): React.CSSProperties => {
-    switch (pending) {
-      case "Pending":
-        return { color: "#000", backgroundColor: "#ffff00" };
-      case "Finished":
-        return { color: "#fff", backgroundColor: "#008000" };
-      case "Important":
-        return { color: "#fff", backgroundColor: "#ff0000" };
-      default:
-        return {};
-    }
-  }, []);
+
 
   return (
     <>
@@ -73,8 +58,6 @@ export default function RequestTable({
         appendTo={document.body}
         style={{
           position: "fixed",
-          top: menuPos.y,
-          left: menuPos.x,
           margin: 0,
           padding: "4px 8px",
           listStyle: "none",
@@ -144,6 +127,7 @@ export default function RequestTable({
         />
         <Column field="port" header="Port" sortable resizeable style={{ width: '5%' }}/>
         <Column field="reqLength" header="Req Length" sortable resizeable style={{ width: '6%' }}/>
+        <Column field="resLength" header="Res Length" sortable resizeable style={{ width: '6%' }}/>
 
         {/* Champ « Pending » si vous le gardez */}
         <Column

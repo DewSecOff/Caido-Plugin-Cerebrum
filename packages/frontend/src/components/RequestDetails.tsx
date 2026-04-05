@@ -21,7 +21,7 @@ export default function RequestDetails({
   const [note, setNote] = useState(request.note);
   const [pending, setPending] = useState(request.pending);
   const [isEditing, setIsEditing] = useState(false);
- const textareaRef = useRef<any>(null);
+  const textareaRef = useRef<any>(null);
 
   useEffect(() => {
     setNote(request.note);
@@ -33,36 +33,60 @@ export default function RequestDetails({
   };
 
   const statusOptions = [
-    { label: "Not touched", value: "Not touched", activeBg: "#6B7280", activeText: "#FFFFFF" }, // gray-500
-    { label: "Pending",     value: "Pending",     activeBg: "#D97706", activeText: "#FFFFFF" }, // yellow-400
-    { label: "Finished",    value: "Finished",    activeBg: "#16A34A", activeText: "#FFFFFF" }, // green-600
-    { label: "Important",   value: "Important",   activeBg: "#DC2626", activeText: "#FFFFFF" }, // red-600
-    ];
+    { label: "Not touched", value: "Not touched", activeBg: "#6B7280", activeText: "#FFFFFF" },
+    { label: "Pending",     value: "Pending",     activeBg: "#D97706", activeText: "#FFFFFF" },
+    { label: "Finished",    value: "Finished",    activeBg: "#16A34A", activeText: "#FFFFFF" },
+    { label: "Important",   value: "Important",   activeBg: "#DC2626", activeText: "#FFFFFF" },
+  ];
 
   return (
     <div className="p-4 bg-white dark:bg-surface-800 rounded h-full flex flex-col">
-      {/* Header: gauche = titre, droite = Note */}
+      {/* Header */}
       <div className="flex items-center mb-4">
-        <h2 className="text-lg font-bold flex-1">Request Details</h2>
+        <h2 className="text-lg font-bold" style={{ flex: 2 }}>Request / Response</h2>
         <h2 className="text-lg font-bold flex-1 text-left">&nbsp;&nbsp;&nbsp;Note</h2>
       </div>
 
-      {/* Contenu principal */}
+      {/* Main content */}
       <div className="flex flex-1 h-full gap-4 overflow-hidden">
-        {/* Gauche : éditeur HTTP */}
-        <div className="flex-1 border rounded overflow-hidden h-full">
-          <HTTPEditor
-            type="request"
-            value={request.reqRaw}
-            style={{ height: "100%" }}
-            removeHeader
-            removeFooter
-          />
+
+        {/* Left: Request editor */}
+        <div className="flex flex-col flex-1 h-full overflow-hidden">
+          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 pl-1">Request</span>
+          <div className="flex-1 border rounded overflow-hidden">
+            <HTTPEditor
+              type="request"
+              value={request.reqRaw}
+              style={{ height: "100%" }}
+              removeHeader
+              removeFooter
+            />
+          </div>
         </div>
 
-        {/* Droite : note, status, save */}
+        {/* Center: Response editor */}
+        <div className="flex flex-col flex-1 h-full overflow-hidden">
+          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1 pl-1">Response</span>
+          <div className="flex-1 border rounded overflow-hidden">
+            {request.resRaw ? (
+              <HTTPEditor
+                type="response"
+                value={request.resRaw}
+                style={{ height: "100%" }}
+                removeHeader
+                removeFooter
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full text-gray-500 text-sm italic">
+                No response captured
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right: note, status, save */}
         <div className="flex flex-col flex-1 h-full">
-          {/* Note → 6 parts sur 8 (75%) */}
+          {/* Note */}
           <div className="flex-6 p-2 overflow-auto h-full">
             {isEditing ? (
               <InputTextarea
@@ -89,7 +113,7 @@ export default function RequestDetails({
             )}
           </div>
 
-          {/* Status (1/8 de la hauteur) */}
+          {/* Status */}
           <div className="flex-1 p-2 flex">
             <div className="flex w-full h-full gap-2">
               {statusOptions.map((opt) => {
@@ -112,11 +136,12 @@ export default function RequestDetails({
             </div>
           </div>
 
-          {/* Save (1/8 de la hauteur) */}
-           <div className="flex-1 p-2">
+          {/* Save */}
+          <div className="flex-1 p-2">
             <Button label="Save" onClick={handleSave} className="w-full save-button" />
           </div>
         </div>
+
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, ReactNode } from "react";
 import type { CaidoSDK } from "../index";
 
 // Create a Context for the Caido SDK

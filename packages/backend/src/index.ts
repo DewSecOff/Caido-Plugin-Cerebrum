@@ -22,9 +22,15 @@ export async function init(sdk: SDK<BackendAPI, BackendEvents>) {
       status TEXT,
       reqLength INTEGER,
       pending TEXT,
-      note TEXT
+      note TEXT,
+      resRaw TEXT,
+      resLength INTEGER
     )
   `);
+
+  // Migration: add resRaw / resLength to existing DBs that predate these columns
+  try { await db.exec(`ALTER TABLE requests ADD COLUMN resRaw TEXT DEFAULT ''`); } catch (_) {}
+  try { await db.exec(`ALTER TABLE requests ADD COLUMN resLength INTEGER DEFAULT 0`); } catch (_) {}
 
   // Register API method to save a new request
   sdk.api.register("saveRequest", async (_sdk, req: CerebrumRequest) => {
@@ -64,6 +70,8 @@ export async function init(sdk: SDK<BackendAPI, BackendEvents>) {
       reqLength: row.reqLength,
       pending: row.pending,
       note: row.note,
+      resRaw: row.resRaw ?? "",
+      resLength: row.resLength ?? 0,
     }));
 
     //sdk.console.log(`Affichage tab : ${tab_request}`);
@@ -93,11 +101,11 @@ export async function init(sdk: SDK<BackendAPI, BackendEvents>) {
 async function insertRequest(db: Awaited<ReturnType<SDK["meta"]["db"]>>, sdk: SDK, req: CerebrumRequest) {
   const stmt = await db.prepare(`
     INSERT OR REPLACE INTO requests 
-       (time, host, path, port, isTls, reqRaw, method, url, headers, body, status, reqLength, pending, note) 
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+       (time, host, path, port, isTls, reqRaw, method, url, headers, body, status, reqLength, pending, note, resRaw, resLength) 
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
    `);
 
-  const result = await stmt.run(
+  await stmt.run(
     req.time,
     req.host,
     req.path,
@@ -111,7 +119,9 @@ async function insertRequest(db: Awaited<ReturnType<SDK["meta"]["db"]>>, sdk: SD
     req.status,
     req.reqLength,
     "Not touched",
-    "Empty"
+    "Empty",
+    req.resRaw ?? "",
+    req.resLength ?? 0
   );
 
   //sdk.console.log(`🧾 Inserted request: ${result.lastInsertRowid}`);
@@ -146,6 +156,8 @@ export type CerebrumRequest = {
   body: string;
   status: string;
   reqLength: number;
+  resRaw: string;
+  resLength: number;
 };
 
 // Internal database row structure
@@ -165,6 +177,8 @@ type DBRow = {
   reqLength: number;
   pending: string;
   note: string;
+  resRaw: string;
+  resLength: number;
 };
 
 // Return shape sent back to frontend
@@ -184,6 +198,8 @@ export type CerebrumEntry = {
   reqLength: number;
   pending: string;
   note: string;
+  resRaw: string;
+  resLength: number;
 };
 
 function rebuildUrl(req: CerebrumRequest): string {

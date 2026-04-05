@@ -1,50 +1,81 @@
-# Cerebrum for Caido
+# Organizer for Caido
 
-🧠 A simple organizer-like plugin for Caido to help you manage, annotate, and sort HTTP requests.
+📁 A powerful organizer plugin for [Caido](https://caido.io) to help you manage, annotate, and analyze HTTP requests **and their full responses**.
 
 ## ✨ Features
 
-- Save and persist HTTP requests from Caido
-- Add custom notes and statuses (`Important`, `Not touched`, `Pending`, `Finished`)
-- Filter requests by status, search, and fields
-- Inline context menu to delete requests
-- Note + status saved locally and in SQLite
-- UI built with React and TailwindCSS
+- Save and persist HTTP requests **and responses** from Caido's HTTP History
+- View the full **raw HTTP request and response side-by-side** in a split-panel layout
+- Add custom notes and statuses: `Not touched`, `Pending`, `Finished`, `Important`
+- Filter saved requests by status, search, and other fields
+- `Req Length` and **`Res Length`** columns in the request table for quick size analysis
+- Right-click context menu integration in HTTP History ("Send to Organizer")
+- Inline right-click menu to delete saved requests
+- All data persisted locally in SQLite via Caido's plugin API
 
 ## 🚀 Screenshots
+<img width="2560" height="1319" alt="image" src="https://github.com/user-attachments/assets/2a2c2bb1-cde7-478c-b255-721c6e60287e" />
 
-![Main UI](./images/Cerebrum_v1.0.5.png)
-![Context Menu](./images/Cerebrum_v1_context.png)
 
 ## 🛠 Usage
 
-- Install plugin
-- Use right-click → "Send to Cerebrum" on a request
-- View saved requests from the "Cerebrum" sidebar tab
+1. Install the plugin from `dist/plugin_package.zip` in Caido's Plugin Manager
+2. In **HTTP History**, right-click any request → **"Send to Organizer (Table)"**
+3. Open the **Organizer** tab from the sidebar
+4. Click any saved entry to view the full Request / Response split view
+5. Add notes, set a status, and save
 
 ## 📦 Technical Stack
 
 - **Frontend**: React + TailwindCSS
-- **Backend**: Caido plugin API + SQLite
-- **SDKs**: Caido Frontend/Backend SDKs + GraphQL
+- **Backend**: Caido Plugin API + SQLite
+- **SDKs**: `@caido/sdk-frontend` + `@caido/sdk-backend` + GraphQL
 
-## 🧪 Known limitations
+## 🗃 Database Schema
 
-- 📥 Requests are read-only once saved (raw cannot be edited)
-- 📝 No export/import functionality yet
+Response data is stored in the plugin's SQLite database alongside request data:
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `reqRaw` | TEXT | Raw HTTP request string |
+| `reqLength` | INTEGER | Request byte length |
+| `resRaw` | TEXT | Full raw HTTP response string |
+| `resLength` | INTEGER | Response byte length |
+| `status` | TEXT | User-assigned status |
+| `note` | TEXT | User-assigned note |
+
+
+> Existing installs are automatically migrated via `ALTER TABLE` on first load.
 
 ## 📁 Structure
 
-- `backend/` — SQLite logic + API definitions
-- `frontend/` — React UI, SDK integration, filtering
-- `src/components` — `RequestTable.tsx`, `RequestDetails.tsx`, etc.
+```
+packages/
+├── backend/        # SQLite schema, types, and API handlers
+└── frontend/
+    └── src/
+        ├── index.tsx             # Plugin entry — commands, menu registration
+        ├── Organizer.tsx         # Main UI component
+        └── components/
+            ├── RequestTable.tsx  # Saved requests table (with Res Length col)
+            ├── RequestDetails.tsx# Split request/response view + note editor
+            └── httpeditor/       # Caido HTTP editor wrapper component
+```
+
+## 🧪 Known Limitations
+
+- 📥 Saved requests are read-only — raw cannot be edited after saving
+- 📝 No export/import functionality yet
 
 ## 🎯 Future Goals
 
-- 🔄 Automatically load requests on startup (avoid relying on manual "load" button)
-- 📤 Support sending requests back into Replay
-- 📦 Add JSON export for individual or full request data
+- 📤 Send saved requests directly into Replay
+- 📦 JSON export for individual or full request/response data
+- 🔍 Full-text search within raw request/response bodies
 
-## 🧑‍💻 Author
+## 🧑‍💻 Authors
 
-Built by DewSecOff — Contributions welcome!
+- **DewSecOff** — Original plugin
+- **h0tak88r** — Fork: added full HTTP response capture & split-panel view
+
+Contributions welcome!

@@ -8,7 +8,7 @@ export default defineConfig({
   build: {
     lib: {
       entry: resolve(__dirname, "src/index.tsx"),
-      name: "cerebrum-frontend",
+      name: "organizer-frontend",
       fileName: () => "script.js",
       formats: ["es"]
     },

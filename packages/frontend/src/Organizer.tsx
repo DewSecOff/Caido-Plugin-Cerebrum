@@ -1,6 +1,6 @@
-// src/Cerebrum.tsx
+// src/Organizer.tsx
 
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { InputText } from "primereact/inputtext";
 import RequestTable from "./components/RequestTable";
 import RequestDetails from "./components/RequestDetails";
@@ -12,15 +12,15 @@ import { Caido } from "@caido/sdk-frontend";
 
 export type CaidoSDK = Caido<BackendAPI, BackendEvents>;
 
-export interface CerebrumProps {
+export interface OrganizerProps {
   initialRequests: CerebrumEntry[];
 }
 
 
-export default function Cerebrum({ initialRequests }: CerebrumProps) {
+export default function Organizer({ initialRequests }: OrganizerProps) {
   const sdk = useSDK();
 
-  // États
+  // States
   const [allRequests, setAllRequests] = useState<CerebrumEntry[]>([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<Record<string, boolean>>({
@@ -33,7 +33,7 @@ export default function Cerebrum({ initialRequests }: CerebrumProps) {
   const [selectedRequest, setSelectedRequest] = useState<CerebrumEntry | null>(null);
   const [detailHeight, setDetailHeight] = useState(window.innerHeight * 0.33);
 
-  // Fonction de chargement
+  // Load all requests from backend
   const reloadAll = useCallback(async () => {
     try {
       const data = await sdk.backend.getAllRequests();
@@ -43,15 +43,15 @@ export default function Cerebrum({ initialRequests }: CerebrumProps) {
     }
   }, [sdk.backend]);
 
-  // 1) Chargement initial
+  // 1) Initial load
   useEffect(() => {
     reloadAll();
   }, [reloadAll]);
 
-  // 2) Reload à chaque retour sur la page via hashchange
+  // 2) Reload on hash navigation back to this page
   useEffect(() => {
     const onHashChange = () => {
-      if (window.location.hash === "#/cerebrum") {
+      if (window.location.hash === "#/organizer") {
         reloadAll();
       }
     };
@@ -59,18 +59,19 @@ export default function Cerebrum({ initialRequests }: CerebrumProps) {
     return () => window.removeEventListener("hashchange", onHashChange);
   }, [reloadAll]);
 
-  // 3) Recharge automatique quand le backend émet un nouvel événement
+  // 3) Bug 1 Fix: ignore callback if unmounted (Caido SDK may not provide an unsubscribe for onEvent)
   useEffect(() => {
+    let mounted = true;
     const handler = () => {
-      reloadAll();
+      if (mounted) reloadAll();
     };
     sdk.backend.onEvent("new-request", handler);
     return () => {
-      sdk.backend.onEvent("new-request", handler);
+      mounted = false;
     };
   }, [sdk.backend, reloadAll]);
 
-  // 4) Filtrage search + status
+  // 4) Filter by search + status
   useEffect(() => {
     const q = search.trim().toLowerCase();
     setFilteredRequests(
@@ -91,19 +92,19 @@ export default function Cerebrum({ initialRequests }: CerebrumProps) {
     );
   }, [allRequests, search, statusFilter]);
 
-  // Sélection
+  // Select a request
   const selectRequest = useCallback((r: CerebrumEntry) => {
     setSelectedRequest(r);
-    window.dispatchEvent(new Event("cerebrum:clear-badge"));
+    window.dispatchEvent(new Event("organizer:clear-badge"));
   }, []);
 
-  // Suppression
+  // Delete a request
   const deleteRequest = useCallback(async (id: string) => {
     await sdk.backend.deleteRequest(id);
     setAllRequests(prev => prev.filter(r => r.id !== id));
     setFilteredRequests(prev => prev.filter(r => r.id !== id));
     if (selectedRequest?.id === id) setSelectedRequest(null);
-    sdk.window.showToast("Requête supprimée", { duration: 2000 });
+    sdk.window.showToast("Request deleted", { duration: 2000 });
   }, [sdk, selectedRequest]);
 
   // Update note/pending
@@ -111,7 +112,7 @@ export default function Cerebrum({ initialRequests }: CerebrumProps) {
     await sdk.backend.updateRequest({ id: req.id, note: req.note, pending: req.pending });
     setAllRequests(prev => prev.map(r => (r.id === req.id ? req : r)));
     setFilteredRequests(prev => prev.map(r => (r.id === req.id ? req : r)));
-    sdk.window.showToast("Modifications enregistrées", { duration: 2000 });
+    sdk.window.showToast("Changes saved", { duration: 2000 });
   }, [sdk]);
 
   const STATUSES = ["Not touched", "Pending", "Finished", "Important"];
